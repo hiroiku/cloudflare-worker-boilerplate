@@ -1,0 +1,51 @@
+{
+	"compilerOptions": {
+		/* このファイルの詳細は https://aka.ms/tsconfig.json を参照 */
+
+		/* 出力する JavaScript の言語バージョンと互換性のあるライブラリ宣言を設定する */
+		"target": "es2024",
+		/* ターゲットのランタイム環境を記述するライブラリ宣言ファイルのセットを指定する */
+		"lib": ["es2024"],
+		/* 生成される JSX コードの形式を指定する */
+		"jsx": "react-jsx",
+
+		/* 生成されるモジュールコードの形式を指定する */
+		"module": "es2022",
+		/* モジュール指定子からファイルを解決する方法を指定する */
+		"moduleResolution": "Bundler",
+		/* .json ファイルのインポートを有効にする */
+		"resolveJsonModule": true,
+
+		/* JavaScript ファイルをプログラムの一部として許可する。`checkJS` オプションでこれらのファイルからエラーを取得できる */
+		"allowJs": true,
+		/* 型チェックされた JavaScript ファイルでのエラー報告を有効にする */
+		"checkJs": false,
+
+		/* コンパイル時にファイルを出力しない */
+		"noEmit": true,
+
+		/* 各ファイルが他のインポートに依存せず安全にトランスパイルできるようにする */
+		"isolatedModules": true,
+		/* モジュールにデフォルトエクスポートがない場合でも 'import x from y' を許可する */
+		"allowSyntheticDefaultImports": true,
+		/* インポート時のファイル名の大文字・小文字の一貫性を強制する */
+		"forceConsistentCasingInFileNames": true,
+
+		/* すべての厳格な型チェックオプションを有効にする */
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+
+		/* すべての .d.ts ファイルの型チェックをスキップする */
+		"skipLibCheck": true,
+		"types": ["./worker-configuration.d.ts", "node"]
+	},
+	"exclude": ["test"],
+	"include": ["./worker-configuration.d.ts", "./src/**/*.ts"]
+}

@@ -1,0 +1,84 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+
+	// バージョン管理 (.gitignore を尊重して node_modules 等を自動除外)
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+
+	// ファイルの除外
+	"files": {
+		// Biome 未対応のファイル形式をエラーにせずスキップ
+		"ignoreUnknown": true,
+		// wrangler types で自動生成されるファイルを除外
+		"includes": ["**", "!worker-configuration.d.ts"]
+	},
+
+	// コードのフォーマット
+	"formatter": {
+		// インデントスタイル
+		"indentStyle": "tab",
+		// 行幅
+		"lineWidth": 120
+	},
+
+	// コードの静的解析
+	"linter": {
+		"rules": {
+			// 推奨ルール
+			"recommended": true,
+
+			// コードスタイルの一貫性
+			"style": {
+				// if/else/for/while 等の波括弧
+				"useBlockStatements": "error",
+				// import type の使用
+				"useImportType": "error",
+				// 推論可能な型注釈
+				"noInferrableTypes": "error",
+				// クラスメンバーのアクセス修飾子
+				"useConsistentMemberAccessibility": "error"
+			},
+
+			// バグの疑いがあるコードの検出
+			"suspicious": {
+				// console の使用
+				"noConsole": "error",
+				// 空ブロック
+				"noEmptyBlockStatements": "error",
+				// 空インターフェース
+				"noEmptyInterface": "off"
+			},
+
+			// 実験的ルール (将来変更の可能性あり)
+			"nursery": {
+				// 三項演算子
+				"noTernary": "error",
+				// 型の明示
+				"useExplicitType": "error",
+				// Promise の未処理
+				"noFloatingPromises": "error"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			// 引用符スタイル
+			"quoteStyle": "single",
+			// アロー関数の括弧 (asNeeded: 必要な場合のみ、always: 常に必要)
+			"arrowParentheses": "asNeeded",
+			// 末尾のカンマ (all: 全ての配列/オブジェクトに末尾のカンマを追加)
+			"trailingCommas": "all"
+		}
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				// import 文の自動整理
+				"organizeImports": "on"
+			}
+		}
+	}
+}
