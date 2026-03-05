@@ -1,0 +1,53 @@
+diff --git a/node_modules/vitest/.bun-tag-56431e462fa55a59 b/.bun-tag-56431e462fa55a59
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/vitest/.bun-tag-ba63037eb06971df b/.bun-tag-ba63037eb06971df
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/chunks/coverage.AVPTjMgw.js b/dist/chunks/coverage.AVPTjMgw.js
+index 9226d79784087235b9f1d79f32d8c8a8ab1e350f..b8bae3f73a28d929e722a2745aba4c2687961dd3 100644
+--- a/dist/chunks/coverage.AVPTjMgw.js
++++ b/dist/chunks/coverage.AVPTjMgw.js
+@@ -2958,11 +2958,6 @@ Update your dependencies and make sure the versions match.`));
+ 			force: true,
+ 			maxRetries: 10
+ 		});
+-		if (existsSync(this.coverageFilesDirectory)) await promises.rm(this.coverageFilesDirectory, {
+-			recursive: true,
+-			force: true,
+-			maxRetries: 10
+-		});
+ 		await promises.mkdir(this.coverageFilesDirectory, { recursive: true });
+ 		this.coverageFiles = /* @__PURE__ */ new Map();
+ 		this.pendingPromises = [];
+@@ -2979,15 +2974,20 @@ Update your dependencies and make sure the versions match.`));
+ 		entry[environment] ??= {};
+ 		// If there's a result from previous run, overwrite it
+ 		entry[environment][testFilenames] = filename;
+-		const promise = promises.writeFile(filename, JSON.stringify(coverage), "utf-8");
++		const coverageFilesDirectory = this.coverageFilesDirectory;
++		const promise = promises.mkdir(coverageFilesDirectory, { recursive: true }).then(() => promises.writeFile(filename, JSON.stringify(coverage), "utf-8"));
+ 		this.pendingPromises.push(promise);
+ 	}
+ 	async readCoverageFiles({ onFileRead, onFinished, onDebug }) {
+ 		let index = 0;
++		// Snapshot coverageFiles before awaiting, so late-arriving onAfterSuiteRun calls
++		// (which can arrive after pool.runTests() resolves due to IPC buffering) do not
++		// add new entries that haven't been written to disk yet.
++		const coverageFilesSnapshot = new Map(this.coverageFiles);
+ 		const total = this.pendingPromises.length;
+ 		await Promise.all(this.pendingPromises);
+ 		this.pendingPromises = [];
+-		for (const [projectName, coveragePerProject] of this.coverageFiles.entries()) for (const [environment, coverageByTestfiles] of Object.entries(coveragePerProject)) {
++		for (const [projectName, coveragePerProject] of coverageFilesSnapshot.entries()) for (const [environment, coverageByTestfiles] of Object.entries(coveragePerProject)) {
+ 			const filenames = Object.values(coverageByTestfiles);
+ 			const project = this.ctx.getProjectByName(projectName);
+ 			for (const chunk of this.toSlices(filenames, this.options.processingConcurrency)) {
+@@ -3005,7 +3005,6 @@ Update your dependencies and make sure the versions match.`));
+ 	}
+ 	async cleanAfterRun() {
+ 		this.coverageFiles = /* @__PURE__ */ new Map();
+-		await promises.rm(this.coverageFilesDirectory, { recursive: true });
+ 		// Remove empty reports directory, e.g. when only text-reporter is used
+ 		if (readdirSync(this.options.reportsDirectory).length === 0) await promises.rm(this.options.reportsDirectory, { recursive: true });
+ 	}

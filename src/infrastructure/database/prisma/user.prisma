@@ -1,0 +1,12 @@
+/// ユーザー
+///
+/// @namespace User
+/// @namespace Overview
+model User {
+  id        String   @id @default(cuid()) @map("id")
+  email     String   @default("") @map("email")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}

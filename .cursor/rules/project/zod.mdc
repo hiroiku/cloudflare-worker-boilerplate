@@ -1,0 +1,37 @@
+---
+description: Zod のスキーマ定義・LLM 構造化出力規約
+alwaysApply: true
+---
+
+# Zod
+
+## LLM 構造化出力
+
+- `z.object()` の各フィールドに `.describe()` で説明を付与する
+
+---
+
+## スキーマ定義
+
+- ファイル名は `{用途}.schema.ts` とする
+- 型エクスポート: `z.infer<typeof schema>` で型を導出する
+
+---
+
+## 制約
+
+### MUST NOT
+
+- `zod-to-json-schema` 等の外部パッケージを使用しない
+  理由: Zod 4 以降には `toJSONSchema` が組み込まれており、外部パッケージは不要
+  代わりに: Zod 組み込みの `toJSONSchema` を使用する
+
+- `.describe()` なしで LLM 用スキーマを定義しない
+  理由: LLM がフィールドの意味を推測できず、構造化出力の精度が低下する
+  代わりに: 全フィールドに `.describe()` で説明を付与する
+
+---
+
+## 関連ドキュメント
+
+- [クリーンアーキテクチャ仕様](../architecture/clean-architecture.md)

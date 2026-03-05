@@ -1,0 +1,24 @@
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 0.75rem 1.5rem;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #ffffff;
+	cursor: pointer;
+	background-color: #0f172a;
+	border: none;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+}
+
+.button:hover {
+	background-color: #1e293b;
+	transform: translateY(-1px);
+}
+
+.button:active {
+	transform: translateY(0);
+}

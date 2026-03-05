@@ -1,0 +1,16 @@
+{
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit"
+	},
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+	"files.associations": {
+		".dev.vars": "dotenv",
+		".dev.vars.example": "dotenv",
+		"wrangler.json": "jsonc"
+	},
+	"prisma.pinToPrisma6": true
+}

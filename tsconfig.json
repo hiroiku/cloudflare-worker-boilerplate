@@ -1,0 +1,66 @@
+{
+	"compilerOptions": {
+		/* JavaScript ファイルをプログラムの一部として許可する。`checkJS` オプションでこれらのファイルからエラーを取得できる */
+		"allowJs": true,
+		/* モジュールにデフォルトエクスポートがない場合でも 'import x from y' を許可する */
+		"allowSyntheticDefaultImports": true,
+		/* 型チェックされた JavaScript ファイルでのエラー報告を有効にする */
+		"checkJs": false,
+		"exactOptionalPropertyTypes": true,
+		/* インポート時のファイル名の大文字・小文字の一貫性を強制する */
+		"forceConsistentCasingInFileNames": true,
+
+		/* 各ファイルが他のインポートに依存せず安全にトランスパイルできるようにする */
+		"isolatedModules": true,
+		/* 生成される JSX コードの形式を指定する */
+		"jsx": "react-jsx",
+		/* Qwik JSX 変換に必要 */
+		"jsxImportSource": "@builder.io/qwik",
+		/* ターゲットのランタイム環境を記述するライブラリ宣言ファイルのセットを指定する */
+		"lib": ["es2024", "DOM", "DOM.Iterable", "WebWorker"],
+
+		/* 生成されるモジュールコードの形式を指定する */
+		"module": "es2022",
+		/* モジュール指定子からファイルを解決する方法を指定する */
+		"moduleResolution": "Bundler",
+
+		/* コンパイル時にファイルを出力しない */
+		"noEmit": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		// "noPropertyAccessFromIndexSignature": true,
+		"noUncheckedIndexedAccess": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"paths": {
+			"~/*": ["./src/*"],
+			"~test/*": ["./test/*"],
+			"~mock/*": ["./test/mock/*"]
+		},
+		/* .json ファイルのインポートを有効にする */
+		"resolveJsonModule": true,
+
+		/* すべての .d.ts ファイルの型チェックをスキップする */
+		"skipLibCheck": true,
+
+		/* すべての厳格な型チェックオプションを有効にする */
+		"strict": true,
+		/* このファイルの詳細は https://aka.ms/tsconfig.json を参照 */
+
+		/* 出力する JavaScript の言語バージョンと互換性のあるライブラリ宣言を設定する */
+		"target": "es2024",
+		"types": ["node", "bun"]
+	},
+	"files": ["./worker-configuration.d.ts", "./qwik.env.d.ts"],
+	"include": [
+		"./src/**/*.ts",
+		"./src/**/*.tsx",
+		"./test/**/*.ts",
+		"./test/**/*.tsx",
+		"./prisma.config.ts",
+		"./vite.config.ts",
+		"./vitest.config.ts",
+		"./vite-plugins/**/*.ts"
+	]
+}

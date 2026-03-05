@@ -1,0 +1,44 @@
+---
+description: Katagami DI コンテナの設定・トークン・ライフタイム・resolve 規約
+alwaysApply: true
+---
+
+# Katagami
+
+軽量 TypeScript DI コンテナ。
+
+コンテナの構成パターン (ファイル分割・登録順序・型エイリアス・Output Port の型・インフラクライアントの扱い・useContainer のキャッシュパターン) は `clean-architecture.md` の「DI Container の構成パターン」セクションを参照。
+
+---
+
+## トークン戦略
+
+すべてのトークンを PropertyKey (文字列キー) に統一する。Output Port (Repository, Gateway) は interface で型を定義し、PropertyKey で登録する。
+
+- PropertyKey トークンは `Service` インターフェースに定義し、登録順序に依存しない
+- Output Port の型は interface で定義する (abstract class は使用しない)
+
+---
+
+## ライフタイムの使い分け
+
+| ライフタイム | 用途 | 例 |
+| --- | --- | --- |
+| Singleton | Repository 実装、Gateway 実装 | `'FooRepository'`, `'BarGateway'` |
+| Transient | ステートレスな Use Case | `'CreateFooUseCase'` |
+| Scoped | リクエストスコープが必要な場合 | (将来利用) |
+
+---
+
+## 制約
+
+### MUST NOT
+
+- `tryResolve` で未登録トークンを暗黙的に無視しない (オプショナルな依存が明確な場合のみ使用する)
+  理由: 未登録トークンのサイレントな無視は、設定ミスの検出を遅らせる
+
+- disposed コンテナ/スコープから resolve しない
+  理由: 破棄済みリソースへのアクセスは予測不能な動作の原因になる
+
+- Singleton/Transient ファクトリ内で Scoped トークンを resolve しない (Captive Dependency)
+  理由: Scoped インスタンスの寿命が Singleton に引き延ばされ、メモリリークや状態汚染が発生する。コンパイル時 + ランタイムで防止される

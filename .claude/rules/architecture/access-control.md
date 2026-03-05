@@ -1,0 +1,109 @@
+# アクセス制御
+
+ReBAC (Relationship-Based Access Control) を採用する。認可判定はエンティティ間の関係性 (owner-of, member-of, belongs-to, privileged-role 等) で決定する。外部 ReBAC エンジン (SpiceDB 等) は使用せず、Application 層の認可サービスに集約する。
+
+---
+
+## アーキテクチャ
+
+認可判定は Application Service として単一クラスに集約する。UseCase はこのサービスをコンストラクター注入で受け取り、`execute()` 内で認可を行う。
+
+認可サービスは UseCase と同様に Transient で登録する。
+
+---
+
+## メソッドパターン
+
+認可サービスは 2 種類のメソッドを提供する。
+
+### 判定メソッド (boolean 返却)
+
+- 非同期でリポジトリを参照することがある
+- 戻り値は `Promise<boolean>`
+- 呼び出し元が結果に応じて制御を分岐する
+
+### アサートメソッド (void 返却、失敗時エラーをスロー)
+
+- 認可条件を満たさない場合は `AccessDeniedError` をスロー
+- 条件を満たす場合は `void` を返し、後続処理に進む
+- UseCase の実行ガードとして使用する
+
+### 使い分け基準
+
+| 用途 | 使うメソッド |
+| --- | --- |
+| UseCase の実行可否を制御する (許可/拒否) | アサートメソッド |
+| UI の表示要素を切り替える (viewerRole 判定等) | 判定メソッド |
+
+---
+
+## エラークラスの区別
+
+| エラークラス | 継承元 | 発生場所 | HTTP レスポンス |
+| --- | --- | --- | --- |
+| `AccessDeniedError` | `ApplicationError` | 認可サービス内 | 403 Forbidden |
+| `UnauthorizedAccessError` | `InfrastructureError` | UI ルートハンドラー内 | リダイレクト (認証フロー) |
+
+- 認可失敗 (ログイン済みだが権限不足) → `AccessDeniedError`
+- 認証不足 (セッション情報が存在しない、URL パラメーターと認証情報が不一致) → `UnauthorizedAccessError`
+
+---
+
+## UseCase 認可パターン
+
+UseCase の `execute()` 内でアサートメソッドを呼び、失敗した場合は `AccessDeniedError` がスローされ、呼び出し元のルートハンドラーでキャッチされる。
+
+UseCase が `AccessDeniedError` をスローする可能性がある場合、`@throws` JSDoc に記載する。
+
+---
+
+## ルートガードパターン
+
+### 階層構造
+
+認証・認可チェックはルート階層に沿って順に実施する。
+
+- 認証プラグイン: セッション/トークンの存在を確認する
+- 一般レイアウトガード: リソースへの所属チェックを行い、ユーザー情報をリクエストコンテキストに格納する
+- 特権レイアウトガード: 特権ロール (Super Admin 等) のチェックを行う
+- 子ルートのハンドラー: 親で検証済みの内容を重複チェックしない
+
+親ガードで取得したユーザー情報はリクエストスコープのコンテキスト (sharedMap 等) 経由で子ルートに渡す。子ルートで再取得しない。
+
+`routeLoader$` 等の読み取りハンドラーでアクセス拒否の場合はリダイレクトで処理する (`requestEvent.redirect`)。
+
+---
+
+## 制約
+
+### MUST
+
+- UseCase が `AccessDeniedError` をスローする可能性がある場合、`@throws` JSDoc を記載する
+  理由: 呼び出し元が認可エラーのハンドリングを認識できなければ、403 レスポンスの変換漏れが発生する
+
+### MUST NOT
+
+- エンティティのフィールドを直接比較して認可判定しない (例: `userId === resource.ownerId`)
+  理由: 認可ロジックが UseCase/UI に散在し、ルール変更時に全箇所の修正が必要になる
+  代わりに: 認可サービスのアサートメソッドを使う
+
+- 特権フラグ (例: `user.isSuperAdmin`) を UseCase や UI コードで直接参照しない
+  理由: 特権ロジックが認可サービス外に漏れ、権限管理の一元性が失われる
+  代わりに: 認可サービスのアサートメソッドを使う
+
+- 認可サービスの外で `AccessDeniedError` をスローしない
+  理由: 認可判定の責務が散在し、認可ロジックの一貫性を保証できなくなる
+
+- 認可失敗に `UnauthorizedAccessError` を使わない
+  理由: `UnauthorizedAccessError` は認証不足 (401) 専用。認可失敗 (403) との混同はセキュリティリスクになる
+
+- 親ルートガードで確認済みのチェックを子ルートで重複しない
+  理由: 同一チェックの二重実行はパフォーマンスを浪費し、不整合の原因になる
+
+- UseCase 内で Repository を直接取得して関係性チェックしない
+  理由: 認可ロジックが UseCase に漏洩し、テスト時のモック設定が煩雑になる
+  代わりに: 認可サービス経由で行う
+
+---
+
+実装パターン (コード例、テストモック) は [access-control-patterns.md](access-control-patterns.md) を参照。

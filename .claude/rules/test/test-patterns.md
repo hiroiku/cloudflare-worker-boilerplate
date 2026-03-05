@@ -1,0 +1,177 @@
+---
+paths: ['*.spec.ts', '*.spec.tsx', '*.mock.ts']
+---
+
+# テスト実装パターン
+
+テスト原則・制約は [test.md](test.md) を参照。
+
+---
+
+## AAA パターン (Arrange-Act-Assert)
+
+各テストケースは以下の 3 段階で構成すること。
+
+- **Arrange (準備)**: テストの前提条件・セットアップを行う
+- **Act (実行)**: テスト対象のメソッド・処理を実行する
+- **Assert (検証)**: 結果をアサーションで検証する
+
+## テスト構造の品質
+
+- `describe` のネストは 3 段以内に抑える
+- `it` / `test` の説明文は具体的にする ("should work"、"correctly" のみなど曖昧な記述は禁止)
+
+## Given-When-Then (BDD スタイル)
+
+振る舞いを記述する場合は、Given-When-Then の形式を意識すること。
+
+- **Given**: 前提条件
+- **When**: 実行する操作
+- **Then**: 期待する結果
+
+---
+
+## `vi.mock()` モジュールモックのパターン
+
+**(a) DI コンテナモック** -- ルートハンドラーテストの標準形:
+
+```ts
+vi.mock('~/container');
+// テスト内:
+vi.mocked(useContainer).mockResolvedValue({
+	resolve: vi.fn().mockReturnValue({ execute: mockExecute }),
+} as never);
+```
+
+**(b) 外部 SDK モジュールモック**:
+
+```ts
+vi.mock('some-sdk', () => ({ someExport: (config: Record<string, unknown>) => config }));
+```
+
+**(c) グローバルモック** -- `test/setup.ts` に配置。個別 spec には書かない:
+
+```ts
+vi.mock('@framework/virtual-module', () => ({
+	default: {
+		/* 最小スタブ */
+	},
+}));
+```
+
+## テスト特有の型回避パターン
+
+テストコード内でのみ許可される型キャスト。
+
+| パターン | 用途 | 例 |
+| --- | --- | --- |
+| `as never` | テスト対象が使うプロパティのみ提供する不完全モックを引数に渡す | `handler(event as never)` |
+| `as unknown as T` | モックオブジェクトを具象型にキャストする | `{} as unknown as DbClient` |
+
+プロダクションコードでの `as never` / `as unknown as` は禁止。
+
+---
+
+## ルートハンドラーテストのパターン
+
+`routeLoader$` / `routeAction$` のテスト手順を定型化する。
+
+1. `vi.mock('~/container')` でモジュールモック
+2. `createMockRequestEvent()` (`test/helpers/`) でイベント生成
+3. `event.sharedMap.set(GUARD_KEY, {...})` で親ガード結果を注入
+4. `vi.mocked(useContainer).mockResolvedValue(...)` で UseCase 戻り値を設定
+5. `.tsx` が export するラッパー関数 (`loadXxx` / `handleXxx`) を呼び出し
+6. アサーション
+
+```ts
+vi.mock('~/container');
+
+it('...', async () => {
+	// Arrange
+	const mockExecute = vi.fn().mockResolvedValue(outputData);
+	vi.mocked(useContainer).mockResolvedValue({
+		resolve: vi.fn().mockReturnValue({ execute: mockExecute }),
+	} as never);
+	const event = createMockRequestEvent({ params: { id: 'foo-1' } });
+	event.sharedMap.set(GUARD_KEY, { user: mockUser });
+
+	// Act
+	const result = await loadFoo(event as never);
+
+	// Assert
+	expect(result).toEqual(expectedOutput);
+	expect(mockExecute).toHaveBeenCalledWith({ id: 'foo-1', userId: mockUser.id });
+});
+```
+
+## コンポーネントテストのパターン
+
+`createDOM` + テストプロバイダー + ローダー ID 注入パターンを定型化する。
+
+```ts
+import { createDOM } from '@builder.io/qwik/testing';
+import { TestProvider, getLoaderId } from '~test/helpers/mock-provider';
+
+const { screen, render } = await createDOM();
+await render(
+	<TestProvider loaders={[{ data: loaderData, id: getLoaderId(useFooLoader) }]} url="http://localhost/path">
+		<FooComponent />
+	</TestProvider>,
+);
+```
+
+---
+
+## 統合テスト実装パターン
+
+### 手動ワイヤリングパターン
+
+DI コンテナを使用せず、テスト内で依存ツリーを手動構築する。
+
+```ts
+const fooRepository = createMockFooRepository({
+	findById: vi.fn(() => Promise.resolve(existingRecord)),
+});
+const realService = new RealService(new DependencyResolverService(/* mock repos */), fooRepository);
+const useCase = new DeleteFooUseCase(fooRepository, realService);
+await useCase.execute(input);
+```
+
+### ステートフルモックパターン
+
+複数ステップのフローでは、前のステップの出力が後のステップの入力になることを検証するため、Repository モックに状態を持たせてよい。
+
+```ts
+let savedRecord: FooRecord | null = null;
+const fooRepository = createMockFooRepository({
+	save: vi.fn(input => {
+		savedRecord = { id: 'generated-id', ...input, createdAt: new Date() };
+		return Promise.resolve(savedRecord);
+	}),
+	findById: vi.fn(id => Promise.resolve(savedRecord?.id === id ? savedRecord : null)),
+});
+```
+
+---
+
+## エラーテストパターン
+
+`@throws` で文書化された例外には以下のパターンで対応テストを書く。
+
+```ts
+// エラーがスローされること + 副作用が発生しないことを検証する
+await expect(useCase.execute(input)).rejects.toThrow(FooNotFoundError);
+expect(mockRepository.save).not.toHaveBeenCalled();
+```
+
+リダイレクトが発生するハンドラーは try/catch でキャッチしてリダイレクト先を検証する。
+
+```ts
+// リダイレクトエラーをキャッチしてリダイレクト先 URL を検証する
+try {
+	await guardFoo(event as never);
+	expect.fail('should have thrown');
+} catch (error) {
+	expect(error).toMatchObject({ status: 302, location: '/login' });
+}
+```

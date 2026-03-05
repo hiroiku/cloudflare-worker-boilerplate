@@ -1,0 +1,141 @@
+---
+paths: ['*.js', '*.jsx', '*.ts', '*.tsx']
+---
+
+# JavaScript/TypeScript 共通規約
+
+このファイルは JavaScript と TypeScript で共通のコーディング規約を定義する。
+
+TypeScript 固有の規約については [`typescript.md`](./typescript.md) を参照。
+
+---
+
+## 変数・定数
+
+### MUST
+
+- 変数は `const` を優先し、`let` は最小限にする
+  理由: 不変性を担保し、意図しない再代入を防ぐ
+
+## 関数
+
+### MUST
+
+- 純粋関数には `function` を使用する
+
+## クラス
+
+### MUST
+
+- クラスプロパティは不変にする (JavaScript では凍結、TypeScript では `readonly`)
+  理由: 不変性を担保し、意図しない状態変更を防ぐ
+
+### MUST NOT
+
+- `constructor` のパラメータプロパティを使用しない
+  理由: クラスのメンバー定義が constructor シグネチャに隠れ、可読性が低下する
+  代わりに: クラスのメンバーとして明示的に定義し、`constructor` で受け取る
+
+  ```js
+  // JavaScript の場合
+  class Example {
+  	#param;
+
+  	constructor(param) {
+  		this.#param = param;
+  	}
+  }
+  ```
+
+## null 安全
+
+### MUST
+
+- null 判定は `??` を使用する
+
+## ドキュメント
+
+### JSDoc の対象
+
+- 必須: public API (エクスポートされるクラス、関数、public メソッド/プロパティ)
+- 任意: private/protected メンバー (複雑なロジックの場合は推奨)
+
+### 記載内容
+
+- クラス: 説明文と責務
+- メソッド/関数: 説明文、`@param` (各引数の説明)、`@returns` (戻り値の説明)
+- プロパティ: 名前から不明瞭な場合のみ説明文
+
+### 例外ドキュメント
+
+### MUST
+
+- 例外を投げる可能性がある場合は `@throws` を記載する
+- 例外の型と発生条件を明記する
+- 複数の例外を投げる場合は、それぞれ個別に記載する
+
+  ```js
+  /**
+   * ユーザーを ID で取得する
+   * @param id ユーザー ID
+   * @returns ユーザー情報
+   * @throws {NotFoundError} 指定された ID のユーザーが存在しない場合
+   * @throws {ValidationError} ID の形式が不正な場合
+   */
+  function getUser(id) { ... }
+  ```
+
+### 省略可能なケース
+
+- getter/setter で名前から明らかな場合
+- コンストラクタで依存注入のみの場合
+- `id`、`name` など自明なプロパティ
+
+### 追加タグ
+
+- `@example`: 使用例を示す場合
+- `@see`: 関連ドキュメントへの参照
+- `@deprecated`: 非推奨の場合 (代替手段を明記)
+- `@url`: 仕様の出典
+
+## イテレーション
+
+### MUST
+
+- 配列処理では `Array.prototype.forEach()` より `for` 文を優先して使う
+  理由: `for` 文は `break` / `continue` / `return` が使え、非同期処理との相性がよい
+
+## モジュール
+
+### MUST NOT
+
+- バレルエクスポート (`index.js` による再エクスポート) を使用しない
+  理由: ツリーシェイキングが効きにくく、循環参照の原因になりやすい
+  代わりに: 各モジュールから直接インポートする
+
+  ```js
+  // NG - バレルエクスポート経由
+  import { Foo } from '@/some-module';
+  import { Foo } from '@/some-module/index.js';
+
+  // OK - 直接インポート
+  import { Foo } from '@/some-module/sub/foo.js';
+  ```
+
+## リソース管理
+
+リソースの取得と解放を `using` / `await using` で宣言的に行い、手動の `try/finally` を排除する。
+
+### MUST
+
+- リソースの解放が必要な場面では `using` / `await using` を第一選択とする
+- `try/finally` は宣言的に表現できないケースに限定する
+
+### MUST NOT
+
+- `using` / `await using` で管理可能なリソースに対する手動の `try/finally` を使用しない
+  理由: 宣言的なリソース管理の方が解放漏れのリスクが低い
+
+- `Symbol.dispose` / `Symbol.asyncDispose` を外部から直接呼び出さない
+  理由: `using` 構文がライフサイクルを管理するため、直接呼び出しは二重解放のリスクがある
+  代わりに: `using` 構文に委ねる

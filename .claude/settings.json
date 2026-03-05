@@ -1,0 +1,19 @@
+{
+	"hooks": {
+		"PostToolUse": [
+			{
+				"hooks": [
+					{
+						"command": "bun run format $CLAUDE_FILE_PATHS || true",
+						"type": "command"
+					},
+					{
+						"command": "afplay /System/Library/Sounds/Blow.aiff",
+						"type": "command"
+					}
+				],
+				"matcher": "Write|Edit"
+			}
+		]
+	}
+}
