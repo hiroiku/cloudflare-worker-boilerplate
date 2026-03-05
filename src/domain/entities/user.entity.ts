@@ -13,7 +13,7 @@ export interface IUserEntity {
 /**
  * シリアライズ境界を越えるユーザースナップショット (Date → string)
  */
-export interface ISerializedUserEntity {
+export interface IUserSerializedEntity {
 	readonly id: string;
 	readonly email: string;
 	readonly createdAt: string;
@@ -25,7 +25,7 @@ export interface ISerializedUserEntity {
  *
  * ID (cuid) で識別する。
  */
-export class UserEntity implements IEntity<IUserEntity, ISerializedUserEntity> {
+export class UserEntity implements IEntity<IUserEntity, IUserSerializedEntity> {
 	public readonly id: string;
 	public readonly email: string;
 	public readonly createdAt: Date;
@@ -38,7 +38,7 @@ export class UserEntity implements IEntity<IUserEntity, ISerializedUserEntity> {
 		this.updatedAt = entity.updatedAt;
 	}
 
-	public serialize(): ISerializedUserEntity {
+	public serialize(): IUserSerializedEntity {
 		return {
 			id: this.id,
 			email: this.email,

@@ -1,12 +1,12 @@
 import type { RequestEventAction, RequestEventLoader } from '@builder.io/qwik-city';
 import { useContainer } from '~/container';
-import type { ISerializedUserEntity } from '~/domain/entities/user.entity';
+import type { IUserSerializedEntity } from '~/domain/entities/user.entity';
 
 /** ユーザー登録のサーバーハンドラー */
 export async function registerUserHandler(
 	data: { email: string },
 	requestEvent: RequestEventAction,
-): Promise<{ user: ISerializedUserEntity }> {
+): Promise<{ user: IUserSerializedEntity }> {
 	const container = await useContainer(requestEvent.platform.env);
 	const useCase = container.resolve('RegisterUserUseCase');
 	const result = await useCase.execute({ email: data.email });
@@ -15,7 +15,7 @@ export async function registerUserHandler(
 }
 
 /** ユーザー一覧取得のサーバーハンドラー (routeLoader 用) */
-export async function getUsersHandler(requestEvent: RequestEventLoader): Promise<{ users: ISerializedUserEntity[] }> {
+export async function getUsersHandler(requestEvent: RequestEventLoader): Promise<{ users: IUserSerializedEntity[] }> {
 	const container = await useContainer(requestEvent.platform.env);
 	const useCase = container.resolve('GetUsersUseCase');
 	const result = await useCase.execute();

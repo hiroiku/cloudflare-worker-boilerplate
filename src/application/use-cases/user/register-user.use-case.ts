@@ -1,5 +1,5 @@
 import type { UserRepository } from '~/application/ports/repositories/user/user.repository';
-import type { ISerializedUserEntity } from '~/domain/entities/user.entity';
+import type { IUserSerializedEntity } from '~/domain/entities/user.entity';
 import { UserEntity } from '~/domain/entities/user.entity';
 
 /** ユーザー登録の入力 */
@@ -9,7 +9,7 @@ export interface RegisterUserInput {
 
 /** ユーザー登録の出力 */
 export interface RegisterUserOutput {
-	readonly user: ISerializedUserEntity;
+	readonly user: IUserSerializedEntity;
 }
 
 /**

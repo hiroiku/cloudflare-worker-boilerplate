@@ -1,10 +1,10 @@
 import type { UserRepository } from '~/application/ports/repositories/user/user.repository';
-import type { ISerializedUserEntity } from '~/domain/entities/user.entity';
+import type { IUserSerializedEntity } from '~/domain/entities/user.entity';
 import { UserEntity } from '~/domain/entities/user.entity';
 
 /** ユーザー一覧取得の出力 */
 export interface GetUsersOutput {
-	readonly users: ISerializedUserEntity[];
+	readonly users: IUserSerializedEntity[];
 }
 
 /**
