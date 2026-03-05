@@ -17,11 +17,11 @@
 
 ## ライフタイムの使い分け
 
-| ライフタイム | 用途 | 例 |
-| --- | --- | --- |
-| Singleton | Repository 実装、Gateway 実装 | `'FooRepository'`, `'BarGateway'` |
-| Transient | ステートレスな Use Case | `'CreateFooUseCase'` |
-| Scoped | リクエストスコープが必要な場合 | (将来利用) |
+| ライフタイム | 用途                           | 例                                |
+| ------------ | ------------------------------ | --------------------------------- |
+| Singleton    | Repository 実装、Gateway 実装  | `'FooRepository'`, `'BarGateway'` |
+| Transient    | ステートレスな Use Case        | `'CreateFooUseCase'`              |
+| Scoped       | リクエストスコープが必要な場合 | (将来利用)                        |
 
 ---
 

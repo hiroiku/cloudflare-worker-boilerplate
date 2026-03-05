@@ -1,6 +1,6 @@
 ---
 description: JavaScript/TypeScript 共通の変数・関数・クラス・モジュール規約
-globs: "**/*.js,**/*.jsx,**/*.ts,**/*.tsx"
+globs: '**/*.js,**/*.jsx,**/*.ts,**/*.tsx'
 alwaysApply: false
 ---
 

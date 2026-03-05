@@ -35,18 +35,18 @@ ReBAC (Relationship-Based Access Control) を採用する。認可判定はエ�
 
 ### 使い分け基準
 
-| 用途 | 使うメソッド |
-| --- | --- |
-| UseCase の実行可否を制御する (許可/拒否) | アサートメソッド |
-| UI の表示要素を切り替える (viewerRole 判定等) | 判定メソッド |
+| 用途                                          | 使うメソッド     |
+| --------------------------------------------- | ---------------- |
+| UseCase の実行可否を制御する (許可/拒否)      | アサートメソッド |
+| UI の表示要素を切り替える (viewerRole 判定等) | 判定メソッド     |
 
 ---
 
 ## エラークラスの区別
 
-| エラークラス | 継承元 | 発生場所 | HTTP レスポンス |
-| --- | --- | --- | --- |
-| `AccessDeniedError` | `ApplicationError` | 認可サービス内 | 403 Forbidden |
+| エラークラス              | 継承元                | 発生場所              | HTTP レスポンス           |
+| ------------------------- | --------------------- | --------------------- | ------------------------- |
+| `AccessDeniedError`       | `ApplicationError`    | 認可サービス内        | 403 Forbidden             |
 | `UnauthorizedAccessError` | `InfrastructureError` | UI ルートハンドラー内 | リダイレクト (認証フロー) |
 
 - 認可失敗 (ログイン済みだが権限不足) → `AccessDeniedError`

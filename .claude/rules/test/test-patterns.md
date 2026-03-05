@@ -63,10 +63,10 @@ vi.mock('@framework/virtual-module', () => ({
 
 テストコード内でのみ許可される型キャスト。
 
-| パターン | 用途 | 例 |
-| --- | --- | --- |
-| `as never` | テスト対象が使うプロパティのみ提供する不完全モックを引数に渡す | `handler(event as never)` |
-| `as unknown as T` | モックオブジェクトを具象型にキャストする | `{} as unknown as DbClient` |
+| パターン          | 用途                                                           | 例                          |
+| ----------------- | -------------------------------------------------------------- | --------------------------- |
+| `as never`        | テスト対象が使うプロパティのみ提供する不完全モックを引数に渡す | `handler(event as never)`   |
+| `as unknown as T` | モックオブジェクトを具象型にキャストする                       | `{} as unknown as DbClient` |
 
 プロダクションコードでの `as never` / `as unknown as` は禁止。
 

@@ -1,6 +1,6 @@
 ---
 description: TypeScript 固有のクラス・null 安全・型安全・JSDoc 規約
-globs: "**/*.ts,**/*.tsx"
+globs: '**/*.ts,**/*.tsx'
 alwaysApply: false
 ---
 

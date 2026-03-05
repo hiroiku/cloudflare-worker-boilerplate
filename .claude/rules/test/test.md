@@ -4,9 +4,9 @@
 
 vitest を唯一のテストランナーとして使用する。
 
-| 対象ファイル | 用途 |
-| --- | --- |
-| `*.spec.ts` | 純粋関数・クラスのユニットテスト |
+| 対象ファイル | 用途                                            |
+| ------------ | ----------------------------------------------- |
+| `*.spec.ts`  | 純粋関数・クラスのユニットテスト                |
 | `*.spec.tsx` | Qwik コンポーネント等、optimizer が必要なテスト |
 
 - `.spec.tsx` は JSX やフレームワーク optimizer を実際に使用するテストにのみ使用する (それ以外は `.spec.ts`)
@@ -43,12 +43,12 @@ test/
 
 ファクトリ関数の命名はサフィックスにポートの型名を含める。
 
-| 対象 | 命名パターン | 例 |
-| --- | --- | --- |
-| Repository | `createMock{Name}Repository` | `createMockFooRepository` |
+| 対象        | 命名パターン                  | 例                         |
+| ----------- | ----------------------------- | -------------------------- |
+| Repository  | `createMock{Name}Repository`  | `createMockFooRepository`  |
 | Integration | `createMock{Name}Integration` | `createMockBarIntegration` |
-| Service | `createMock{Name}Service` | `createMockBazService` |
-| その他 | `createMock{Name}` | `createMockToolContext` |
+| Service     | `createMock{Name}Service`     | `createMockBazService`     |
+| その他      | `createMock{Name}`            | `createMockToolContext`    |
 
 - ファクトリ関数は `test/mock/` 配下にポート構造をミラーリングして配置する
   - Repository mock: `test/mock/application/repositories/{feature}/{name}.repository.mock.ts`
@@ -79,13 +79,13 @@ test/
 
 ### テスト対象範囲
 
-| レイヤー | 統合テストでの扱い |
-| --- | --- |
-| UseCase | 実インスタンス |
-| Application Service | 実インスタンス |
-| Domain Entity / Service | 実インスタンス |
-| Repository Port | モック (共有ファクトリ使用) |
-| Integration Port | モック (共有ファクトリ使用) |
+| レイヤー                | 統合テストでの扱い          |
+| ----------------------- | --------------------------- |
+| UseCase                 | 実インスタンス              |
+| Application Service     | 実インスタンス              |
+| Domain Entity / Service | 実インスタンス              |
+| Repository Port         | モック (共有ファクトリ使用) |
+| Integration Port        | モック (共有ファクトリ使用) |
 
 ## テストの意図をコメントで記述する
 
@@ -153,6 +153,7 @@ test/
 - 構造的デッドテストを残さない
   理由: 実行されないテストはメンテナンスコストを浪費し、「テストがある」という誤った安心感を与える
   対象:
+
   - `it.skip()` / `test.skip()` / `describe.skip()` / `xit()` / `xdescribe()` を理由コメントや TODO なしに放置したもの
   - `it()` / `test()` のボディが空、または `TODO` / `FIXME` コメントのみで実装が書かれていないテスト
   - 対応する実装ファイルが存在しないテストファイル (リネーム・削除後の残骸)

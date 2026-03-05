@@ -42,10 +42,10 @@ routes/some-page/
 `.tsx` では `.server.ts` のハンドラーを静的 import し、`routeLoader$` / `routeAction$` に渡すラッパー関数を定義する。ラッパーは export し、テストから直接呼び出せるようにする。
 
 | ハンドラー種別 | `.tsx` ラッパー名 | `.server.ts` ハンドラー名 |
-| --- | --- | --- |
-| `routeLoader$` | `load{Name}` | `{name}Handler` |
-| `routeAction$` | `handle{Name}` | `{name}Handler` |
-| `onRequest` | `guard{Name}` | `{name}GuardHandler` |
+| -------------- | ----------------- | ------------------------- |
+| `routeLoader$` | `load{Name}`      | `{name}Handler`           |
+| `routeAction$` | `handle{Name}`    | `{name}Handler`           |
+| `onRequest`    | `guard{Name}`     | `{name}GuardHandler`      |
 
 ### サーバー専用ルート (`.ts`)
 
@@ -58,6 +58,20 @@ routes/some-page/
 シリアライズ境界越え (`routeLoader$` → コンポーネント、API レスポンス等) では `I{名前}Entity` を使用する。
 
 `routeLoader$` の戻り値やコンポーネントの props にはクラスインスタンスではなくプレーンオブジェクト型 (`I{名前}Entity`) を使用する。JSON シリアライズでメソッドが失われるため。
+
+---
+
+## フォームバリデーション
+
+`routeAction$` のバリデーションには `zod$` を使用する。Interface/validators ファイルは作成しない。
+
+```typescript
+// zod$ のコールバック形式で qwik-city 内蔵の Zod インスタンスを使用する
+export const useCreateFoo = routeAction$(
+	handleCreateFoo,
+	zod$(z => z.object({ name: z.string().min(1) })),
+);
+```
 
 ---
 
@@ -90,3 +104,11 @@ routes/some-page/
 - テストで `.server.ts` のハンドラーを直接 import しない
   理由: ラッパー関数を経由しないと、実際のルート定義とテストのインターフェースが乖離する
   代わりに: `.tsx` が export するラッパー関数 (`loadXxx` / `handleXxx`) を使用する
+
+- `zod$` に外部 import した `z` インスタンスを直接渡さない
+  理由: Qwik City 内蔵の Zod v3 と `import { z } from 'zod'` (Zod v4) は非互換のためランタイムエラーになる
+  代わりに: `zod$(z => ...)` のコールバック形式を使う
+
+- `routeAction$` のバリデーションのために Interface/validators ファイルを作成しない
+  理由: `zod$` コールバックがスキーマを管理するため、別途 validators ファイルを作ると二重管理になる
+  代わりに: `zod$` コールバック形式を使う

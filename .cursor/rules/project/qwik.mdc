@@ -47,10 +47,10 @@ routes/some-page/
 `.tsx` では `.server.ts` のハンドラーを静的 import し、`routeLoader$` / `routeAction$` に渡すラッパー関数を定義する。ラッパーは export し、テストから直接呼び出せるようにする。
 
 | ハンドラー種別 | `.tsx` ラッパー名 | `.server.ts` ハンドラー名 |
-| --- | --- | --- |
-| `routeLoader$` | `load{Name}` | `{name}Handler` |
-| `routeAction$` | `handle{Name}` | `{name}Handler` |
-| `onRequest` | `guard{Name}` | `{name}GuardHandler` |
+| -------------- | ----------------- | ------------------------- |
+| `routeLoader$` | `load{Name}`      | `{name}Handler`           |
+| `routeAction$` | `handle{Name}`    | `{name}Handler`           |
+| `onRequest`    | `guard{Name}`     | `{name}GuardHandler`      |
 
 ### サーバー専用ルート (`.ts`)
 

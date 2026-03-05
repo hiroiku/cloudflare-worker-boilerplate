@@ -40,7 +40,7 @@
 ├── interface/                 # Interface Adapters
 │   ├── controllers/           # HTTP/GraphQL/CLI等の入力をUseCaseへ
 │   ├── presenters/            # UseCaseの出力を外部レスポンスへ
-│   ├── validators/            # 入力検証
+│   ├── validators/            # 入力検証 (UI フレームワーク統合バリデーションがない境界のみ)
 │   ├── mappers/               # DTO/Request/Response 変換
 │   └── errors/
 │
@@ -59,44 +59,44 @@
 
 `{名前}.{要素タイプ}.ts` の形式で命名する。テストは `*.spec.ts`。
 
-| 層 | 要素 | 命名パターン | 例 |
-| --- | --- | --- | --- |
-| Domain | Entity | `*.entity.ts` | `user.entity.ts` |
-| Domain | Value Object | `*.value-object.ts` | `email.value-object.ts` |
-| Domain | Domain Service | `*.service.ts` | `auth.service.ts` |
-| Domain | Domain Event | `*.event.ts` | `user-created.event.ts` |
-| Domain | Error | `*.error.ts` | `user-not-found.error.ts` |
-| Application | Use Case | `*.use-case.ts` | `create-user.use-case.ts` |
-| Application | Repository Interface | `*.repository.ts` | `user.repository.ts` |
-| Application | Integration Interface | `*.integration.ts` | `auth.integration.ts` |
-| Application | Transport Interface | `*.transport.ts` | `event-bus.transport.ts` |
-| Application | Application Service | `*.service.ts` | `notification.service.ts` |
-| Application | Error | `*.error.ts` | `validation.error.ts` |
-| Interface | Controller | `*.controller.ts` | `user.controller.ts` |
-| Interface | Presenter | `*.presenter.ts` | `user.presenter.ts` |
-| Interface | Validator | `*.validator.ts` | `create-user.validator.ts` |
-| Interface | Mapper | `*.mapper.ts` | `user.mapper.ts` |
-| Interface | Error | `*.error.ts` | `request.error.ts` |
-| Infrastructure | Repository 実装 | `*.repository.ts` | `user.repository.ts` |
-| Infrastructure | Integration 実装 (Adapter/Client) | `*.integration.ts` | `workos.integration.ts` |
-| Infrastructure | Transport 実装 | `*.transport.ts` | `http.transport.ts` |
-| Infrastructure | Error | `*.error.ts` | `database.error.ts` |
-| エントリーポイント | 共通 DI Container | `container.ts` | `container.ts` |
-| エントリーポイント | 層別 DI Container | `container.{layer}.ts` | `container.infrastructure.ts` |
-| エントリーポイント | 環境別 DI Container | `entry.*.container.ts` | `entry.worker.container.ts` |
+| 層                 | 要素                              | 命名パターン           | 例                            |
+| ------------------ | --------------------------------- | ---------------------- | ----------------------------- |
+| Domain             | Entity                            | `*.entity.ts`          | `user.entity.ts`              |
+| Domain             | Value Object                      | `*.value-object.ts`    | `email.value-object.ts`       |
+| Domain             | Domain Service                    | `*.service.ts`         | `auth.service.ts`             |
+| Domain             | Domain Event                      | `*.event.ts`           | `user-created.event.ts`       |
+| Domain             | Error                             | `*.error.ts`           | `user-not-found.error.ts`     |
+| Application        | Use Case                          | `*.use-case.ts`        | `create-user.use-case.ts`     |
+| Application        | Repository Interface              | `*.repository.ts`      | `user.repository.ts`          |
+| Application        | Integration Interface             | `*.integration.ts`     | `auth.integration.ts`         |
+| Application        | Transport Interface               | `*.transport.ts`       | `event-bus.transport.ts`      |
+| Application        | Application Service               | `*.service.ts`         | `notification.service.ts`     |
+| Application        | Error                             | `*.error.ts`           | `validation.error.ts`         |
+| Interface          | Controller                        | `*.controller.ts`      | `user.controller.ts`          |
+| Interface          | Presenter                         | `*.presenter.ts`       | `user.presenter.ts`           |
+| Interface          | Validator                         | `*.validator.ts`       | `create-user.validator.ts`    |
+| Interface          | Mapper                            | `*.mapper.ts`          | `user.mapper.ts`              |
+| Interface          | Error                             | `*.error.ts`           | `request.error.ts`            |
+| Infrastructure     | Repository 実装                   | `*.repository.ts`      | `user.repository.ts`          |
+| Infrastructure     | Integration 実装 (Adapter/Client) | `*.integration.ts`     | `workos.integration.ts`       |
+| Infrastructure     | Transport 実装                    | `*.transport.ts`       | `http.transport.ts`           |
+| Infrastructure     | Error                             | `*.error.ts`           | `database.error.ts`           |
+| エントリーポイント | 共通 DI Container                 | `container.ts`         | `container.ts`                |
+| エントリーポイント | 層別 DI Container                 | `container.{layer}.ts` | `container.infrastructure.ts` |
+| エントリーポイント | 環境別 DI Container               | `entry.*.container.ts` | `entry.worker.container.ts`   |
 
 ---
 
 ## 層構造と依存関係
 
-| 層 | 責務 | 配置するもの | 依存可能な層 (プロジェクト内) |
-| --- | --- | --- | --- |
-| app-kernel | 汎用基盤 (プロジェクト非依存) | BaseError、層別 Error 基底、共通型、純粋ユーティリティ | なし |
-| Domain | ビジネスルール (不変条件・同一性) | Entity、Value Object、Domain Service、Domain Event、Error | app-kernel のみ |
-| Application | ユースケース (手順・取引境界) | Use Case、ports/ (Output Port)、Application Service、統合イベント、Error | Domain、app-kernel |
-| Interface | Inbound (入力受付・検証・変換) | Controller、Presenter、Validator、Mapper、Error | Application、Domain、app-kernel |
-| Infrastructure | Outbound (外部 I/O・SDK・永続化) | repositories/integrations/transport の具象実装、Error | Interface、Application、Domain、app-kernel |
-| エントリーポイント | 起動・DI 組み立て (Composition Root) | `entry.*.ts` / `container.ts` | Infrastructure、Interface |
+| 層                 | 責務                                 | 配置するもの                                                             | 依存可能な層 (プロジェクト内)              |
+| ------------------ | ------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------ |
+| app-kernel         | 汎用基盤 (プロジェクト非依存)        | BaseError、層別 Error 基底、共通型、純粋ユーティリティ                   | なし                                       |
+| Domain             | ビジネスルール (不変条件・同一性)    | Entity、Value Object、Domain Service、Domain Event、Error                | app-kernel のみ                            |
+| Application        | ユースケース (手順・取引境界)        | Use Case、ports/ (Output Port)、Application Service、統合イベント、Error | Domain、app-kernel                         |
+| Interface          | Inbound (入力受付・検証・変換)       | Controller、Presenter、Validator、Mapper、Error                          | Application、Domain、app-kernel            |
+| Infrastructure     | Outbound (外部 I/O・SDK・永続化)     | repositories/integrations/transport の具象実装、Error                    | Interface、Application、Domain、app-kernel |
+| エントリーポイント | 起動・DI 組み立て (Composition Root) | `entry.*.ts` / `container.ts`                                            | Infrastructure、Interface                  |
 
 ---
 
@@ -142,6 +142,8 @@ WorkOS、各種 AI SDK、Mastra 等の外部基盤は `infrastructure/integratio
 ### zod (スキーマ/バリデーション)
 
 - 原則: Interface (validators) で利用する (入力境界の整形・検証)
+- UI フレームワークが統合バリデーション機能を持つ場合、そのフレームワークの機能でスキーマを定義し、Interface/validators ファイルは作成しない
+  理由: フレームワークが入力の整合性を保証するため、validators ファイルを別途作成すると二重管理になる
 - Application で利用する場合は、次を全て満たすこと:
   1. zod の schema や `infer` など zod 由来の型を公開 API にしない (UseCase Input/Output、Port、Domain 公開型に露出しない)
   2. zod のエラー構造を ApplicationError / DomainError / InterfaceError に変換する
@@ -196,11 +198,11 @@ export class UserEntity implements IEntity<IUserEntity> {
 
 ### 型の使い分け
 
-| コンテキスト | 使う型 |
-| --- | --- |
-| 内部 (UseCase/Domain ロジック) | `{Name}Entity` |
-| シリアライズ境界越え (API レスポンス等) | `I{Name}Entity` |
-| Entity → プレーンオブジェクト変換 | `entity.serialize()` |
+| コンテキスト                            | 使う型               |
+| --------------------------------------- | -------------------- |
+| 内部 (UseCase/Domain ロジック)          | `{Name}Entity`       |
+| シリアライズ境界越え (API レスポンス等) | `I{Name}Entity`      |
+| Entity → プレーンオブジェクト変換       | `entity.serialize()` |
 
 ---
 
@@ -239,10 +241,10 @@ DB クライアント、外部 API クライアント等のインフラクライ
 let cachedContainer: AppContainer | undefined;
 
 export async function useContainer(env: Env): Promise<AppContainer> {
-  if (cachedContainer === undefined) {
-    cachedContainer = await buildContainer(env);
-  }
-  return cachedContainer;
+	if (cachedContainer === undefined) {
+		cachedContainer = await buildContainer(env);
+	}
+	return cachedContainer;
 }
 ```
 

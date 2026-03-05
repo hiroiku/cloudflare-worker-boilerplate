@@ -1,6 +1,6 @@
 ---
 description: セマンティック HTML・アクセシビリティ・WAI-ARIA 規約
-globs: "**/*.html,**/*.htm"
+globs: '**/*.html,**/*.htm'
 alwaysApply: false
 ---
 

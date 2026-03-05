@@ -1,6 +1,6 @@
 ---
 description: CSS のセレクタ・命名・ネスティング・パフォーマンス規約
-globs: "**/*.css"
+globs: '**/*.css'
 alwaysApply: false
 ---
 

@@ -2,11 +2,11 @@ import { component$ } from '@builder.io/qwik';
 import {
 	type DocumentHead,
 	Form,
-	type JSONObject,
 	type RequestEventAction,
 	type RequestEventLoader,
 	routeAction$,
 	routeLoader$,
+	zod$,
 } from '@builder.io/qwik-city';
 import { Badge } from '../components/primitives/badge/Badge';
 import { Button } from '../components/primitives/button/Button';
@@ -17,20 +17,28 @@ import styles from './index.module.css';
 import { deleteUserHandler, getUsersHandler, registerUserHandler } from './index.server';
 
 /** deleteUserHandler のラッパー。テストから直接呼び出し可能。 */
-export async function handleDeleteUser(form: JSONObject, requestEvent: RequestEventAction) {
-	return deleteUserHandler(form, requestEvent);
+export async function handleDeleteUser(data: { id: string }, requestEvent: RequestEventAction) {
+	return deleteUserHandler(data, requestEvent);
 }
 
 /** ユーザー削除アクション */
-export const useDeleteUser = routeAction$(handleDeleteUser);
+// zod$ のコールバック形式で qwik-city 内蔵の Zod v3 インスタンスを使用することで Zod v4 との非互換を回避する
+export const useDeleteUser = routeAction$(
+	handleDeleteUser,
+	zod$(z => z.object({ id: z.string().min(1) })),
+);
 
 /** registerUserHandler のラッパー。テストから直接呼び出し可能。 */
-export async function handleRegisterUser(form: JSONObject, requestEvent: RequestEventAction) {
-	return registerUserHandler(form, requestEvent);
+export async function handleRegisterUser(data: { email: string }, requestEvent: RequestEventAction) {
+	return registerUserHandler(data, requestEvent);
 }
 
 /** ユーザー登録アクション */
-export const useRegisterUser = routeAction$(handleRegisterUser);
+// zod$ のコールバック形式で qwik-city 内蔵の Zod v3 インスタンスを使用することで Zod v4 との非互換を回避する
+export const useRegisterUser = routeAction$(
+	handleRegisterUser,
+	zod$(z => z.object({ email: z.string().email() })),
+);
 
 /** getUsersHandler のラッパー。テストから直接呼び出し可能。 */
 export async function loadUsers(requestEvent: RequestEventLoader) {

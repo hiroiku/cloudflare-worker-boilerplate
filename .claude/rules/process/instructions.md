@@ -77,4 +77,3 @@
 ## 検証
 
 検証手順は [self-verification.md](self-verification.md) に従う。
-

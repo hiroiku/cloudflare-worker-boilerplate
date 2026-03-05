@@ -1,6 +1,6 @@
 ---
 description: アクセス制御実装パターン (DI 登録・UseCase 認可・ルートガード・テストモック)
-globs: "**/*.use-case.ts,**/*.server.ts,**/*.spec.ts,**/*.spec.tsx,**/*.mock.ts,**/container*.ts"
+globs: '**/*.use-case.ts,**/*.server.ts,**/*.spec.ts,**/*.spec.tsx,**/*.mock.ts,**/container*.ts'
 alwaysApply: false
 ---
 

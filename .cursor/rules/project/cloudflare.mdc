@@ -15,10 +15,10 @@ Cloudflare Workers の `fetch(request, env, ctx)` が受け取る `Env` を使�
 
 ### 変数の配置基準
 
-| 種別 | 配置先 | 型生成 |
-| --- | --- | --- |
-| 公開値 (Client ID, URL 等) | `wrangler.jsonc` の `vars` | `wrangler types` で自動 |
-| シークレット (API Key 等) | `.env` (ローカル) / `wrangler secret put` (本番) | `wrangler types` で自動 |
+| 種別                       | 配置先                                           | 型生成                  |
+| -------------------------- | ------------------------------------------------ | ----------------------- |
+| 公開値 (Client ID, URL 等) | `wrangler.jsonc` の `vars`                       | `wrangler types` で自動 |
+| シークレット (API Key 等)  | `.env` (ローカル) / `wrangler secret put` (本番) | `wrangler types` で自動 |
 
 ---
 

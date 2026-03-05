@@ -1,6 +1,6 @@
 ---
 description: Markdown の文字種・表記・スペース・作図規約
-globs: "**/*.md"
+globs: '**/*.md'
 alwaysApply: false
 ---
 
