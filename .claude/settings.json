@@ -8,7 +8,7 @@
 						"type": "command"
 					},
 					{
-						"command": "afplay /System/Library/Sounds/Blow.aiff",
+						"command": "afplay -v 0.5 /System/Library/Sounds/Blow.aiff",
 						"type": "command"
 					}
 				],
