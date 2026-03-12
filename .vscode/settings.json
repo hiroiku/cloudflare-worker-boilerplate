@@ -12,5 +12,8 @@
 		".dev.vars.example": "dotenv",
 		"wrangler.json": "jsonc"
 	},
-	"prisma.pinToPrisma6": true
+	"prisma.pinToPrisma6": true,
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }

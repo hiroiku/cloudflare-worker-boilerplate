@@ -11,8 +11,11 @@ export type Service = InfrastructureService & ApplicationService & InterfaceServ
 /** DI Container の型 */
 type AppContainer = Awaited<ReturnType<typeof buildContainer>>;
 
-/** Cloudflare Workers の同一 isolate 内でコンテナをキャッシュする */
-let cachedContainer: AppContainer | undefined;
+/**
+ * Cloudflare Workers の同一 isolate 内でコンテナをキャッシュする。
+ * Promise をキャッシュすることで、並行リクエストが buildContainer を重複実行するのを防ぐ。
+ */
+let containerPromise: Promise<AppContainer> | undefined;
 
 /**
  * DI Container を取得する
@@ -20,11 +23,11 @@ let cachedContainer: AppContainer | undefined;
  * @param env Cloudflare Workers の Env (requestEvent.platform.env)
  */
 export async function useContainer(env: Env): Promise<AppContainer> {
-	if (cachedContainer === undefined) {
-		cachedContainer = await buildContainer(env);
+	if (containerPromise === undefined) {
+		containerPromise = buildContainer(env);
 	}
 
-	return cachedContainer;
+	return containerPromise;
 }
 
 /**
@@ -33,7 +36,7 @@ export async function useContainer(env: Env): Promise<AppContainer> {
  * Infrastructure → Interface → Application の順でレイヤーを合成する。
  */
 async function buildContainer(env: Env) {
-	const [{ buildInfrastructureContainer }] = await Promise.all([import('~/container.infrastructure')]);
+	const { buildInfrastructureContainer } = await import('~/container.infrastructure');
 	const infrastructureContainer = buildInfrastructureContainer(env);
 	const interfaceContainer = buildInterfaceContainer();
 	const applicationContainer = buildApplicationContainer();

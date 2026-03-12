@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   test:
+    if: github.event_name != 'pull_request' || github.base_ref != 'staging' || github.head_ref != 'develop'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -40,6 +41,9 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun run db:push
+        env:
+          DIRECT_DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      - run: bun run db:generate:sql
         env:
           DIRECT_DATABASE_URL: postgresql://user:pass@localhost:5432/db
       - run: bun run format
